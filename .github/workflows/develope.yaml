@@ -11,18 +11,31 @@ jobs:
   versioning:
     permissions: write-all
     runs-on: ubuntu-latest
+    outputs:
+      tags: ${{ steps.result.outputs.tags }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Log
-        if: success()
         run: |
-          echo "::notice ::Revision  : ${{ github.ref }}"
-          echo "::notice ::Revision  : ${{ github.head_ref }}"
-          echo "::notice ::Revision  : ${{ github.ref_name }}"
-          echo "::notice ::Revision  : ${{ github.base_ref }}"
-          echo "::notice ::Revision  : ${{ github.sha }}"
-  # docker-build:
+          echo "::notice ::Ref  : ${{ github.ref }}"
+          echo "::notice ::RefName  : ${{ github.ref_name }}"
+          echo "::notice ::Sha  : ${{ github.sha }}"
+      - name: Result
+        id: result
+        run: |
+          echo "tags<<EOF"                  >> "$GITHUB_OUTPUT"
+          echo "${{ github.sha }}"          >> "$GITHUB_OUTPUT"
+          echo "${{ github.ref_name }}"     >> "$GITHUB_OUTPUT"
+          echo "EOF"                        >> "$GITHUB_OUTPUT"
+  test:
+    needs: [ versioning ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log
+        run: |
+          echo "::notice ::Tag  : ${{ needs.versioning.outputs.tags }}"
+  # build:
   #   needs: [ versioning ]
   #   uses: ./.github/workflows/build.yaml
   #   name: Build Docker (GHCR)
