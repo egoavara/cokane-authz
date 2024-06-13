@@ -5,9 +5,6 @@ on:
     branches:
       - dev
       - feature/*
-      
-permissions:
-  packages: write 
 
 jobs:
   versioning:
@@ -36,4 +33,3 @@ jobs:
     name: Build Docker (GHCR)
     with:
       tags: ${{ needs.versioning.outputs.tags }}
-    secrets: inherit
