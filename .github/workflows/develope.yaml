@@ -5,7 +5,9 @@ on:
     branches:
       - dev
       - feature/*
-
+      
+permissions:
+  packages: write 
 
 jobs:
   versioning:
