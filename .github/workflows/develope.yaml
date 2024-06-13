@@ -18,10 +18,10 @@ jobs:
         if: success()
         run: |
           echo "::notice ::Revision  : ${{ github.ref }}"
+          echo "::notice ::Revision  : ${{ github.head_ref }}"
           echo "::notice ::Revision  : ${{ github.ref_name }}"
           echo "::notice ::Revision  : ${{ github.base_ref }}"
           echo "::notice ::Revision  : ${{ github.sha }}"
-
   # docker-build:
   #   needs: [ versioning ]
   #   uses: ./.github/workflows/build.yaml
