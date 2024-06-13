@@ -4,7 +4,6 @@ on:
   workflow_call:
     inputs:
       hub:
-        required: true
         default: "ghcr.io"
         type: string
       tags:
