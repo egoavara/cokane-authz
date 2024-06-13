@@ -24,21 +24,14 @@ jobs:
       - name: Result
         id: result
         run: |
-          echo "tags<<EOF"                  >> "$GITHUB_OUTPUT"
-          echo "${{ github.sha }}"          >> "$GITHUB_OUTPUT"
-          echo "${{ github.ref_name }}"     >> "$GITHUB_OUTPUT"
-          echo "EOF"                        >> "$GITHUB_OUTPUT"
-  test:
+          echo "tags<<EOF"                              >> "$GITHUB_OUTPUT"
+          echo "${{ github.sha }}"                      >> "$GITHUB_OUTPUT"
+          echo "${{ github.ref_name }}" | tr '/' '-'    >> "$GITHUB_OUTPUT"
+          echo "EOF"                                    >> "$GITHUB_OUTPUT"
+  integration:
     needs: [ versioning ]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Log
-        run: |
-          echo "::notice ::Tag  : ${{ needs.versioning.outputs.tags }}"
-  # build:
-  #   needs: [ versioning ]
-  #   uses: ./.github/workflows/build.yaml
-  #   name: Build Docker (GHCR)
-  #   with:
-  #     tags: ${{ needs.versioning.outputs.tags }}
-  #   secrets: inherit
+    uses: ./.github/workflows/build.yaml
+    name: Build Docker (GHCR)
+    with:
+      tags: ${{ needs.versioning.outputs.tags }}
+    secrets: inherit
