@@ -1,0 +1,48 @@
+name: release
+
+on:
+  workflow_dispatch:
+    inputs:
+      type:
+        type: choice
+        required: true
+        default: next-patch
+        description: "Versioning type"
+        options:
+          - "nextpatch"
+          - "nextminor"
+          - "nextmajor"
+
+jobs:
+  versioning:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Guess semver
+        id: semver
+        uses: egoavara/semver@v0.1.4
+        with:
+          value-type: ${{ inputs.type }}
+          release: "release"
+      - name: Output version
+        run: |
+          echo "tags<<EOF"                                    >> "$GITHUB_OUTPUT"
+          echo "${{ steps.semver.outputs.value }}"            >> "$GITHUB_OUTPUT"
+          echo "${{ steps.semver.outputs.value-nopatch }}"    >> "$GITHUB_OUTPUT"
+          echo "${{ steps.semver.outputs.value-nominor }}"    >> "$GITHUB_OUTPUT"
+          echo "latest"                                       >> "$GITHUB_OUTPUT"
+          echo "EOF"                                          >> "$GITHUB_OUTPUT"
+      - name: Log
+        run: |
+          echo "::notice ::Current  : ${{ steps.semver.outputs.current }}"
+          echo "::notice ::Next     : ${{ steps.semver.outputs.value }}"
+
+  # docker-build:
+  #   needs: [ versioning ]
+  #   uses: ./.github/workflows/build.yaml
+  #   name: Build Docker (GHCR)
+  #   with:
+  #     tags: ${{ needs.versioning.outputs.tags }}
+  #   secrets: inherit
