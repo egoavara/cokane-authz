@@ -1,0 +1,31 @@
+name: develope
+
+on:
+  push: 
+    branches:
+      - dev
+      - issue/*
+
+
+jobs:
+  versioning:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Log
+        if: success()
+        run: |
+          echo "::notice ::Revision  : ${{ github.ref }}"
+          echo "::notice ::Revision  : ${{ github.ref_name }}"
+          echo "::notice ::Revision  : ${{ github.base_ref }}"
+          echo "::notice ::Revision  : ${{ github.sha }}"
+
+  # docker-build:
+  #   needs: [ versioning ]
+  #   uses: ./.github/workflows/build.yaml
+  #   name: Build Docker (GHCR)
+  #   with:
+  #     tags: ${{ needs.versioning.outputs.tags }}
+  #   secrets: inherit

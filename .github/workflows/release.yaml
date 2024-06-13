@@ -6,7 +6,7 @@ on:
       type:
         type: choice
         required: true
-        default: next-patch
+        default: nextpatch
         description: "Versioning type"
         options:
           - "nextpatch"
@@ -19,10 +19,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Guess semver
         id: semver
-        uses: egoavara/semver@v0.1.4
+        uses: egoavara/semver@v1.0.0
         with:
           value-type: ${{ inputs.type }}
           release: "release"
