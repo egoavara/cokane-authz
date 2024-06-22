@@ -1,0 +1,36 @@
+name: deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        required: false
+
+jobs:
+  deploy-on-kubernetes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: actions-hub/kubectl@master
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+      - name: Terraform
+        uses: hashicorp/setup-terraform@v3
+      - name: TagName
+        id: tagname
+        run: |
+          if [ -z "${{ inputs.version }}" ]; then
+            echo "tag=${{ github.sha }}"      >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ inputs.version }}"  >> "$GITHUB_OUTPUT"
+          fi
+      - name: Terraform Value
+        run: |
+          echo 'image = "ghcr.io/egoavara/cokane-authz:${{steps.tagname.outputs.tag}}"' >> "scripts/deploy-app/cicd.tfvars"
+      - name: Terraform Apply
+        run: |
+          cd scripts/deploy-app
+          terraform init
+          terraform apply -var-file="cicd.tfvars" -auto-approve

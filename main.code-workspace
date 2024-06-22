@@ -1,0 +1,66 @@
+{
+    "folders": [
+        {
+            "name": "[cmd]",
+            "path": "./cmd"
+        },
+        {
+            "name": "[pkg]",
+            "path": "./pkg"
+        },
+        {
+            "name": "[scripts]",
+            "path": "./scripts"
+        },
+        {
+            "name": "[action]",
+            "path": "./.github/workflows"
+        },
+        {
+            "name": "[root]",
+            "path": "."
+        }
+    ],
+    "settings": {},
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "Build Docker Image (cokane-authz)",
+                "type": "shell",
+                "options": {
+                    "cwd": "${workspaceFolder}/.."
+                },
+                "command": "go",
+                "args": [
+                    "run",
+                    "./scripts/build-docker",
+                ],
+                "group": {
+                    "kind": "build",
+                    "isDefault": false
+                },
+                "problemMatcher": []
+            },
+            {
+                "label": "Build Application (cokane-authz)",
+                "type": "shell",
+                "options": {
+                    "cwd": "${workspaceFolder}/.."
+                },
+                "command": "go",
+                "args": [
+                    "build",
+                    "-o",
+                    "./targets/cokane-authz",
+                    "./cmd/cokane-authz",
+                ],
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "problemMatcher": []
+            }
+        ],
+    }
+}

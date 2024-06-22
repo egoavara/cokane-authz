@@ -4,7 +4,6 @@ on:
   workflow_call:
     inputs:
       hub:
-        required: true
         default: "ghcr.io"
         type: string
       tags:
@@ -16,6 +15,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,7 +39,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: '.'
-          file: './cmd/cokane-authz/Dockerfile'
+          file: './scripts/build-docker/Dockerfile'
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
