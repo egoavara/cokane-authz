@@ -1,7 +1,7 @@
 package works
 
 import (
-	"egoavara.net/authz/acts"
+	"egoavara.net/authz/pkg/acts"
 	"github.com/google/uuid"
 	"go.temporal.io/sdk/workflow"
 )
