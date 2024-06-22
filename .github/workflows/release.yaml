@@ -17,6 +17,8 @@ jobs:
   versioning:
     permissions: write-all
     runs-on: ubuntu-latest
+    outputs:
+      tags: ${{ steps.output.outputs.tags }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,6 +29,7 @@ jobs:
           value-type: ${{ inputs.type }}
           release: "release"
       - name: Output version
+        id: output
         run: |
           echo "tags<<EOF"                                    >> "$GITHUB_OUTPUT"
           echo "${{ steps.semver.outputs.value }}"            >> "$GITHUB_OUTPUT"
@@ -39,10 +42,10 @@ jobs:
           echo "::notice ::Current  : ${{ steps.semver.outputs.current }}"
           echo "::notice ::Next     : ${{ steps.semver.outputs.value }}"
 
-  # docker-build:
-  #   needs: [ versioning ]
-  #   uses: ./.github/workflows/build.yaml
-  #   name: Build Docker (GHCR)
-  #   with:
-  #     tags: ${{ needs.versioning.outputs.tags }}
-  #   secrets: inherit
+  integration:
+    needs: [ versioning ]
+    uses: ./.github/workflows/build.yaml
+    name: Build Docker (GHCR)
+    with:
+      tags: ${{ needs.versioning.outputs.tags }}
+    secrets: inherit
