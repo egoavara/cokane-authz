@@ -196,3 +196,21 @@ resource "kubernetes_deployment" "manage" {
     }
   }
 }
+
+resource "kubernetes_service" "manage" {
+  metadata {
+    namespace = var.namespace
+    name      = "${local.instance_name}-manage"
+    labels = {
+      app                           = local.instance_name
+      "app.kubernetes.io/name"      = local.app_name
+      "app.kubernetes.io/instance"  = local.instance_name
+      "app.kubernetes.io/version"   = local.version
+      "app.kubernetes.io/component" = "manage"
+      "app.kubernetes.io/part-of"   = local.app_name
+    }
+  }
+  spec {
+    selector = local.app_label_selector
+  }
+}

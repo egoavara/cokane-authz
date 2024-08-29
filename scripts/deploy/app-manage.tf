@@ -78,27 +78,22 @@ resource "kubernetes_deployment" "manage" {
         labels = local.app_label_selector
       }
       spec {
-        # container {
-        #   name              = "main"
-        #   image             = var.image
-        #   image_pull_policy = "Always"
-        #   env {
-        #     name  = "TEMPORAL_URL"
-        #     value = var.temporal-url
-        #   }
-        #   port {
-        #     name           = "http-api"
-        #     container_port = 80
-        #   }
-        #   port {
-        #     name           = "grpc-api"
-        #     container_port = 50080
-        #   }
-        # }
+        container {
+          name  = "main"
+          image = "nginx"
+          port {
+            name           = "http-api"
+            container_port = 80
+          }
+          port {
+            name           = "grpc-api"
+            container_port = 9000
+          }
+        }
         container {
           name  = "openfga"
           image = var.openfga-image
-          args = ["run"]
+          args  = ["run"]
           # playground
           env {
             name  = "OPENFGA_PLAYGROUND_ENABLED"
@@ -111,7 +106,7 @@ resource "kubernetes_deployment" "manage" {
             value = "0.0.0.0:8080"
           }
           # grpc
-          env{
+          env {
             name  = "OPENFGA_GRPC_ADDR"
             value = "0.0.0.0:8081"
           }
@@ -220,5 +215,23 @@ resource "kubernetes_deployment" "manage" {
         }
       }
     }
+  }
+}
+
+resource "kubernetes_service" "manage" {
+  metadata {
+    namespace = var.namespace
+    name      = "${local.instance_name}-manage"
+    labels = {
+      app                           = local.instance_name
+      "app.kubernetes.io/name"      = local.app_name
+      "app.kubernetes.io/instance"  = local.instance_name
+      "app.kubernetes.io/version"   = local.version
+      "app.kubernetes.io/component" = "manage"
+      "app.kubernetes.io/part-of"   = local.app_name
+    }
+  }
+  spec {
+    selector = local.app_label_selector
   }
 }
