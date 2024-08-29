@@ -22,7 +22,7 @@ to quickly create a Cobra application.`,
 		engine := gin.Default()
 		engine.GET("/", func(context *gin.Context) {
 			context.JSON(200, gin.H{
-				"message": "Hello World",
+				"message": "NOT Hello World",
 			})
 		})
 		engine.Run(":80")
