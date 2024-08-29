@@ -31,7 +31,7 @@ resource "kubernetes_deployment" "manage" {
       spec {
         container {
           name    = "main"
-          image   = "golang:1.23"
+          image   = "golang:1.23-alpine"
           command = ["/bin/sh"]
           args    = ["-c", file("${path.module}/files/entrypoint.sh")]
           volume_mount {

@@ -1,8 +1,5 @@
-export GOPATH="$HOME/go"
-export PATH="$GOPATH/bin:$PATH"
-
-go install github.com/mitranim/gow@latest
+apk add watchexec
 
 cd /git/cokane-authz
 
-gow -e=go,mod,html,yaml,json run ./main.go manage
+watchexec --exts go,yaml,yml,mod,json go run ./main.go manage
