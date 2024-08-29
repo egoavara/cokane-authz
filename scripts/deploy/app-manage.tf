@@ -1,4 +1,11 @@
 locals {
+  manage-openfga-initdb = {
+    name = "${local.app_name}-manage-openfga-initdb"
+  }
+  manage-datastore = {
+    name = "${local.app_name}-manage-datastore"
+  }
+
   app_label_selector = {
     "app.kubernetes.io/name"     = local.app_name
     "app.kubernetes.io/instance" = local.instance_name
@@ -19,7 +26,7 @@ resource "random_password" "manage-datastore-password" {
 resource "kubernetes_secret" "manage-datastore" {
   metadata {
     namespace = var.namespace
-    name      = "${local.instance_name}-manage-datastore"
+    name      = local.manage-datastore.name
     labels = {
     }
   }
@@ -33,7 +40,7 @@ resource "kubernetes_secret" "manage-datastore" {
 resource "kubernetes_config_map" "manage-openfga-initdb" {
   metadata {
     namespace = var.namespace
-    name      = "${local.instance_name}-manage-openfga-initdb"
+    name      = local.manage-openfga-initdb.name
     labels = {
       app                           = local.instance_name
       "app.kubernetes.io/name"      = local.app_name
@@ -133,7 +140,7 @@ resource "kubernetes_deployment" "manage" {
             name = "OPENFGA_DATASTORE_USERNAME"
             value_from {
               secret_key_ref {
-                name = kubernetes_secret.manage-datastore.metadata[0].name
+                name = local.manage-datastore.name
                 key  = "USERNAME"
               }
             }
@@ -142,7 +149,7 @@ resource "kubernetes_deployment" "manage" {
             name = "OPENFGA_DATASTORE_PASSWORD"
             value_from {
               secret_key_ref {
-                name = kubernetes_secret.manage-datastore.metadata[0].name
+                name = local.manage-datastore.name
                 key  = "PASSWORD"
               }
             }
@@ -179,7 +186,7 @@ resource "kubernetes_deployment" "manage" {
             name = "POSTGRES_USER"
             value_from {
               secret_key_ref {
-                name = kubernetes_secret.manage-datastore.metadata[0].name
+                name = local.manage-datastore.name
                 key  = "USERNAME"
               }
             }
@@ -189,7 +196,7 @@ resource "kubernetes_deployment" "manage" {
             name = "POSTGRES_PASSWORD"
             value_from {
               secret_key_ref {
-                name = kubernetes_secret.manage-datastore.metadata[0].name
+                name = local.manage-datastore.name
                 key  = "PASSWORD"
               }
             }
@@ -208,7 +215,7 @@ resource "kubernetes_deployment" "manage" {
         volume {
           name = "manage-openfga-initdb"
           config_map {
-            name = kubernetes_config_map.manage-openfga-initdb.metadata[0].name
+            name = local.manage-openfga-initdb.name
           }
         }
       }

@@ -30,21 +30,28 @@ resource "kubernetes_deployment" "manage" {
       }
       spec {
         container {
-          name  = "main"
-          image = "golang:1.23"
+          name    = "main"
+          image   = "golang:1.23"
           command = ["/bin/sh"]
-          args = ["-c", file("${path.module}/files/entrypoint.sh")]
+          args    = ["-c", file("${path.module}/files/entrypoint.sh")]
           volume_mount {
             name       = "git-sync-volume"
             mount_path = "/git"
           }
+          port {
+            protocol       = "TCP"
+            name           = "http-app"
+            container_port = 80
+          }
         }
         container {
-          name  = "git-sync"
-          image = "k8s.gcr.io/git-sync/git-sync:v4.2.4"
+          name              = "git-sync"
+          image             = "k8s.gcr.io/git-sync/git-sync:v4.2.4"
+          image_pull_policy = "IfNotPresent"
 
           args = [
             "--repo=https://github.com/egoavara/cokane-authz",
+            "--ref=refs/heads/${var.branch}",
             "--root=/git",
             "--period=10s",
             "--depth=1",
@@ -99,7 +106,7 @@ resource "kubernetes_deployment" "manage" {
             name = "OPENFGA_DATASTORE_USERNAME"
             value_from {
               secret_key_ref {
-                name = "${local.instance_name}-manage-datastore"
+                name = "${local.app_name}-manage-datastore"
                 key  = "USERNAME"
               }
             }
@@ -108,7 +115,7 @@ resource "kubernetes_deployment" "manage" {
             name = "OPENFGA_DATASTORE_PASSWORD"
             value_from {
               secret_key_ref {
-                name = "${local.instance_name}-manage-datastore"
+                name = "${local.app_name}-manage-datastore"
                 key  = "PASSWORD"
               }
             }
@@ -145,7 +152,7 @@ resource "kubernetes_deployment" "manage" {
             name = "POSTGRES_USER"
             value_from {
               secret_key_ref {
-                name = "${local.instance_name}-manage-datastore"
+                name = "${local.app_name}-manage-datastore"
                 key  = "USERNAME"
               }
             }
@@ -155,7 +162,7 @@ resource "kubernetes_deployment" "manage" {
             name = "POSTGRES_PASSWORD"
             value_from {
               secret_key_ref {
-                name = "${local.instance_name}-manage-datastore"
+                name = "${local.app_name}-manage-datastore"
                 key  = "PASSWORD"
               }
             }
@@ -175,7 +182,7 @@ resource "kubernetes_deployment" "manage" {
         volume {
           name = "manage-openfga-initdb"
           config_map {
-            name = "${local.instance_name}-manage-openfga-initdb"
+            name = "${local.app_name}-manage-openfga-initdb"
           }
         }
 

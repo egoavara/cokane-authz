@@ -27,9 +27,9 @@ jobs:
           echo "${{ github.sha }}"                      >> "$GITHUB_OUTPUT"
           echo "${{ github.ref_name }}" | tr '/' '-'    >> "$GITHUB_OUTPUT"
           echo "EOF"                                    >> "$GITHUB_OUTPUT"
-  integration:
-    needs: [ versioning ]
-    uses: ./.github/workflows/build.yaml
-    name: Build Docker (GHCR)
-    with:
-      tags: ${{ needs.versioning.outputs.tags }}
+  # integration:
+  #   needs: [ versioning ]
+  #   uses: ./.github/workflows/build.yaml
+  #   name: Build Docker (GHCR)
+  #   with:
+  #     tags: ${{ needs.versioning.outputs.tags }}
