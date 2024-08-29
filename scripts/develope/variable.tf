@@ -1,12 +1,11 @@
-variable "image" {
+variable "branch" {
   type     = string
-  default  = "ghcr.io/egoavara/cokane-authz:feature-1"
   nullable = false
 }
 
 variable "name" {
   type     = string
-  default  = null
+  default  = "cokane-authz"
   nullable = true
 }
 
@@ -16,9 +15,8 @@ variable "namespace" {
   nullable = false
 }
 
-variable "temporal-url" {
+variable "openfga-image" {
   type     = string
-  default  = "http://localhost:7233"
+  default  = "openfga/openfga:v1.5.9"
   nullable = false
 }
- 
