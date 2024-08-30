@@ -1,4 +1,4 @@
-name: develope
+name: develope-uninstall
 
 on:
   delete: 
