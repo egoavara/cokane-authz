@@ -1,0 +1,35 @@
+name: develope
+
+on:
+  delete: 
+    branches:
+      - feature/*
+
+jobs:
+  versioning:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    outputs:
+      tags: ${{ steps.result.outputs.tags }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Log
+        run: |
+          echo "::notice ::Event  : ${{ github.event.ref }}"
+          echo "::notice ::Ref  : ${{ github.ref }}"
+          echo "::notice ::RefName  : ${{ github.ref_name }}"
+          echo "::notice ::Sha  : ${{ github.sha }}"
+      - name: Result
+        id: result
+        run: |
+          echo "tags<<EOF"                              >> "$GITHUB_OUTPUT"
+          echo "${{ github.sha }}"                      >> "$GITHUB_OUTPUT"
+          echo "${{ github.ref_name }}" | tr '/' '-'    >> "$GITHUB_OUTPUT"
+          echo "EOF"                                    >> "$GITHUB_OUTPUT"
+  # integration:
+  #   needs: [ versioning ]
+  #   uses: ./.github/workflows/build.yaml
+  #   name: Build Docker (GHCR)
+  #   with:
+  #     tags: ${{ needs.versioning.outputs.tags }}

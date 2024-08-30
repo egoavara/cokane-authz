@@ -3,8 +3,8 @@ name: develope
 on:
   push: 
     branches:
-      - dev
       - feature/*
+  
 
 jobs:
   versioning:
