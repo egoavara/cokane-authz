@@ -1,7 +1,7 @@
 name: develope-uninstall
 
 on:
-  delete: 
+  delete:
     branches:
       - feature/*
 
@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Log
         run: |
-          echo "::notice ::Event  : ${{ github.event.ref }}"
+          echo "${{ toJSON(github.event) }}"
           echo "::notice ::Ref  : ${{ github.ref }}"
           echo "::notice ::RefName  : ${{ github.ref_name }}"
           echo "::notice ::Sha  : ${{ github.sha }}"
