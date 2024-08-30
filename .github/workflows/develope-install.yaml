@@ -17,7 +17,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Log
         run: |
-          echo "::notice ::Event  : ${{ github.event.ref }}"
+          echo "::notice ::Event  : ${{ github.event }}"
+          echo "::notice ::EventRef  : ${{ github.event.ref }}"
           echo "::notice ::Ref  : ${{ github.ref }}"
           echo "::notice ::RefName  : ${{ github.ref_name }}"
           echo "::notice ::Sha  : ${{ github.sha }}"
