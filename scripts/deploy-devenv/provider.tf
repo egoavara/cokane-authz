@@ -30,7 +30,7 @@ terraform {
   backend "kubernetes" {
     config_path    = "~/.kube/config"
     config_context = "k3d-egoavara-net"
-    secret_suffix  = "cokane-authnz-system"
+    secret_suffix  = "cokane-devenv"
     namespace      = "terraform"
   }
 }
