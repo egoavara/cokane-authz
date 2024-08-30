@@ -1,0 +1,20 @@
+name: kubetest
+
+on:
+  workflow_dispatch:
+jobs:
+  versioning:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: actions-hub/kubectl@1.14.3
+        env:
+          KUBE_CONTEXT: ${{ secrets.KUBE_CONFIG }}
+        with:
+          args: get -n cokane-authz pods
+      - name: Log
+        run: |
+          echo "::notice ::Current  : ${{ steps.semver.outputs.current }}"
+          echo "::notice ::Next     : ${{ steps.semver.outputs.value }}"
