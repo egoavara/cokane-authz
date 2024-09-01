@@ -235,7 +235,7 @@ resource "kubernetes_service" "manage" {
 }
 
 
-resource "kubernetes_ingress" "manage" {
+resource "kubernetes_ingress_v1" "manage" {
   metadata {
     namespace = var.namespace
     name      = "${local.instance_name}-manage"
@@ -253,10 +253,15 @@ resource "kubernetes_ingress" "manage" {
       host = var.host
       http {
         path {
-          path = "/"
+          path      = "/api/${local.version}"
+          path_type = "Prefix"
           backend {
-            service_name = kubernetes_service.manage.metadata[0].name
-            service_port = kubernetes_service.manage.spec[0].port[0].port
+            service {
+              name = kubernetes_service.manage.metadata[0].name
+              port {
+                number = kubernetes_service.manage.spec[0].port[0].port
+            }
+              }
           }
         }
       }
