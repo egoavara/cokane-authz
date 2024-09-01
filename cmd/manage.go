@@ -4,8 +4,18 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"net/http"
+	"net/http/httputil"
+	"net/url"
+
+	"egoavara.net/authz/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
+)
+
+var (
+	PROXY_URL *url.URL
+	PROXY     *httputil.ReverseProxy
 )
 
 // manageCmd represents the manage command
@@ -25,6 +35,16 @@ to quickly create a Cobra application.`,
 				"message": "Hello World 2024-09-01T16:37:00",
 			})
 		})
+		engine.Any("/stores/*openfga", func(context *gin.Context) {
+			PROXY.Director = func(req *http.Request) {
+				req.Header = context.Request.Header
+				req.Host = PROXY_URL.Host
+				req.URL.Scheme = PROXY_URL.Scheme
+				req.URL.Host = PROXY_URL.Host
+				req.URL.Path = context.Param("openfga")
+			}
+			PROXY.ServeHTTP(context.Writer, context.Request)
+		})
 		engine.Run(":80")
 	},
 }
@@ -32,6 +52,8 @@ to quickly create a Cobra application.`,
 func init() {
 	rootCmd.AddCommand(manageCmd)
 
+	PROXY_URL = util.Must(url.Parse("http://localhost:8080"))
+	PROXY = httputil.NewSingleHostReverseProxy(PROXY_URL)
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
