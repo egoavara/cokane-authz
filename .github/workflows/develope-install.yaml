@@ -33,10 +33,11 @@ jobs:
           echo "workspace_name=$TEMP_WORKSPACE_NAME"      >> $GITHUB_OUTPUT
       - name: Apply Resources
         run: |
-          echo "::notice ::Deleting ${{ steps.extract-workspace-name.outputs.workspace_name }}"
+          echo "::notice ::Apply ${{ steps.extract-workspace-name.outputs.workspace_name }}"
 
           cd ./scripts/deploy-devapp
 
+          pwd
           terraform init
           terraform workspace select -or-create=true '${{ steps.extract-workspace-name.outputs.workspace_name }}'
           terraform apply -auto-approve -set="branch=${{ steps.extract-workspace-name.outputs.branch_name }}"
