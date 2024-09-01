@@ -40,7 +40,6 @@ jobs:
           
           cd ./scripts/deploy-devapp
 
-          kubectl config view
           terraform init
           terraform workspace select -or-create=true '${{ steps.extract-workspace-name.outputs.workspace_name }}'
           terraform apply -auto-approve -var="branch=${{ steps.extract-workspace-name.outputs.branch_name }}"

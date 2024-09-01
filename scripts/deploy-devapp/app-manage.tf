@@ -43,6 +43,12 @@ resource "kubernetes_deployment" "manage" {
             name           = "http-app"
             container_port = 80
           }
+
+          port {
+            protocol       = "TCP"
+            name           = "grpc-app"
+            container_port = 90
+          }
         }
         container {
           name              = "git-sync"
@@ -212,5 +218,18 @@ resource "kubernetes_service" "manage" {
   }
   spec {
     selector = local.app_label_selector
+    port {
+      protocol    = "TCP"
+      name        = "http-app"
+      port        = 80
+      target_port = 80
+    }
+
+    port {
+      protocol    = "TCP"
+      name        = "grpc-app"
+      port        = 90
+      target_port = 90
+    }
   }
 }
