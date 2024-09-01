@@ -233,3 +233,33 @@ resource "kubernetes_service" "manage" {
     }
   }
 }
+
+
+resource "kubernetes_ingress" "manage" {
+  metadata {
+    namespace = var.namespace
+    name      = "${local.instance_name}-manage"
+    labels = {
+      app                           = local.instance_name
+      "app.kubernetes.io/name"      = local.app_name
+      "app.kubernetes.io/instance"  = local.instance_name
+      "app.kubernetes.io/version"   = local.version
+      "app.kubernetes.io/component" = "manage"
+      "app.kubernetes.io/part-of"   = local.app_name
+    }
+  }
+  spec {
+    rule {
+      host = var.host
+      http {
+        path {
+          path = "/"
+          backend {
+            service_name = kubernetes_service.manage.metadata[0].name
+            service_port = kubernetes_service.manage.spec[0].port[0].port
+          }
+        }
+      }
+    }
+  }
+}

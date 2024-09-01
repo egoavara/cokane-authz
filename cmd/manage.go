@@ -4,6 +4,7 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -31,22 +32,20 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		engine := gin.Default()
-		engine.GET("/", func(context *gin.Context) {
+		engine.GET("/api/:version/", func(context *gin.Context) {
 			context.JSON(200, gin.H{
-				"message": "Hello World 2024-09-01T16:37:00",
+				"message": fmt.Sprintf("Hello from %s", context.Param("version")),
 			})
 		})
-		engine.Any("/stores/*paths", func(context *gin.Context) {
-
+		engine.Any("/api/:version/openfga/*paths", func(context *gin.Context) {
 			PROXY.Director = func(req *http.Request) {
 				req.Header = context.Request.Header
 				req.Host = PROXY_URL.Host
 				req.URL.Scheme = PROXY_URL.Scheme
 				req.URL.Host = PROXY_URL.Host
 				req.URL.Path = context.Param("paths")
-				log.Println("req", req.URL)
+				log.Println("Request to", req.URL)
 			}
-			log.Println("Proxying to", PROXY_URL)
 			PROXY.ServeHTTP(context.Writer, context.Request)
 		})
 		engine.Run(":80")

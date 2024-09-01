@@ -3,6 +3,13 @@ variable "branch" {
   nullable = false
 }
 
+variable "host" {
+  type     = string
+  default = "auth.egoavara.net"
+  nullable = false
+  
+}
+
 variable "name" {
   type     = string
   default  = "cokane-authz"
