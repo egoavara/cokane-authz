@@ -34,9 +34,9 @@ jobs:
       - name: Apply Resources
         run: |
           echo "::notice ::Apply ${{ steps.extract-workspace-name.outputs.workspace_name }}"
-
+          ls -al
           cd ./scripts/deploy-devapp
-
+          ls -al
           pwd
           terraform init
           terraform workspace select -or-create=true '${{ steps.extract-workspace-name.outputs.workspace_name }}'
