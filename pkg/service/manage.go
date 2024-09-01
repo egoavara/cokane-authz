@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"time"
 
 	"egoavara.net/authz/pkg/util"
 	"github.com/gin-gonic/gin"
@@ -21,7 +22,7 @@ func (s *Manage) Setup(engine *gin.Engine) {
 	api := engine.Group("/api/:version/")
 	api.GET("/", func(context *gin.Context) {
 		context.JSON(200, gin.H{
-			"message": fmt.Sprintf("Hello from %s", context.Param("version")),
+			"message": fmt.Sprintf("Hello from %s %s", context.Param("version"), time.Now().Format(time.RFC3339)),
 		})
 	})
 	api.Any("/openfga/*paths", func(context *gin.Context) {
