@@ -15,7 +15,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - uses: azure/setup-kubectl@v4
-      - run: echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config 
+      - run: |
+        mkdir -p ${HOME}/.kube
+        echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config 
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
