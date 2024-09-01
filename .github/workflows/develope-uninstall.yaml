@@ -41,5 +41,5 @@ jobs:
 
           terraform init
           terraform workspace select '${{ steps.extract-workspace-name.outputs.workspace_name }}'
-          terraform destroy -auto-approve -set="branch=${{ steps.extract-workspace-name.outputs.branch_name }}"
+          terraform destroy -auto-approve -var="branch=${{ steps.extract-workspace-name.outputs.branch_name }}"
           terraform workspace delete '${{ steps.extract-workspace-name.outputs.workspace_name }}''
