@@ -39,6 +39,7 @@ jobs:
 
           cd ./scripts/deploy-devapp
 
+          kubectl config view
           terraform init
           terraform workspace select '${{ steps.extract-workspace-name.outputs.workspace_name }}'
           terraform destroy -auto-approve -set="branch=${{ steps.extract-workspace-name.outputs.branch_name }}"
