@@ -44,6 +44,7 @@ to quickly create a Cobra application.`,
 				req.URL.Scheme = PROXY_URL.Scheme
 				req.URL.Host = PROXY_URL.Host
 				req.URL.Path = context.Param("paths")
+				log.Println("req", req.URL)
 			}
 			log.Println("Proxying to", PROXY_URL)
 			PROXY.ServeHTTP(context.Writer, context.Request)
