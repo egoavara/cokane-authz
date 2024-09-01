@@ -35,13 +35,13 @@ to quickly create a Cobra application.`,
 				"message": "Hello World 2024-09-01T16:37:00",
 			})
 		})
-		engine.Any("/stores/*openfga", func(context *gin.Context) {
+		engine.Any("/stores/*paths", func(context *gin.Context) {
 			PROXY.Director = func(req *http.Request) {
 				req.Header = context.Request.Header
 				req.Host = PROXY_URL.Host
 				req.URL.Scheme = PROXY_URL.Scheme
 				req.URL.Host = PROXY_URL.Host
-				req.URL.Path = context.Param("openfga")
+				req.URL.Path = context.Param("paths")
 			}
 			PROXY.ServeHTTP(context.Writer, context.Request)
 		})
