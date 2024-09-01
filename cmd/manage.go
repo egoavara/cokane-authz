@@ -23,7 +23,7 @@ to quickly create a Cobra application.`,
 		engine := gin.Default()
 		main := service.NewManage()
 		main.Setup(engine)
-		engine.Run(":8000")
+		engine.Run(":80")
 	},
 }
 
