@@ -18,7 +18,10 @@ jobs:
       - name: Setup Kubernetes
         uses: actions-hub/kubectl@master
         env:
-          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}ml.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -34,10 +37,7 @@ jobs:
       - name: Apply Resources
         run: |
           echo "::notice ::Apply ${{ steps.extract-workspace-name.outputs.workspace_name }}"
-          ls -al
           cd ./scripts/deploy-devapp
-          ls -al
-          pwd
           terraform init
           terraform workspace select -or-create=true '${{ steps.extract-workspace-name.outputs.workspace_name }}'
           terraform apply -auto-approve -set="branch=${{ steps.extract-workspace-name.outputs.branch_name }}"
