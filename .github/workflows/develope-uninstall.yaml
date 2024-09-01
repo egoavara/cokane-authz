@@ -14,22 +14,29 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Log
+      - name: Setup Kubernetes
+        uses: actions-hub/kubectl@master
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.5"
+      - name: Extract Workspace Name
+        id: extract-workspace-name
         run: |
-          echo "${{ toJSON(github.event) }} "
-          echo "::notice ::Ref  : ${{ github.ref }}"
-          echo "::notice ::RefName  : ${{ github.ref_name }}"
-          echo "::notice ::Sha  : ${{ github.sha }}"
-      - name: Result
-        id: result
+          TEMP_BRANCH_NAME=$(echo ${{ github.event.ref }} | sed -E 's|refs/heads/(.+)|\1|')
+          TEMP_WORKSPACE_NAME=$(echo $TEMP_BRANCH_NAME | tr '/' '-')
+
+          echo "branch_name=$TEMP_BRANCH_NAME"            >> $GITHUB_OUTPUT
+          echo "workspace_name=$TEMP_WORKSPACE_NAME"      >> $GITHUB_OUTPUT
+      - name: Destroy Resources
         run: |
-          echo "tags<<EOF"                              >> "$GITHUB_OUTPUT"
-          echo "${{ github.sha }}"                      >> "$GITHUB_OUTPUT"
-          echo "${{ github.ref_name }}" | tr '/' '-'    >> "$GITHUB_OUTPUT"
-          echo "EOF"                                    >> "$GITHUB_OUTPUT"
-  # integration:
-  #   needs: [ versioning ]
-  #   uses: ./.github/workflows/build.yaml
-  #   name: Build Docker (GHCR)
-  #   with:
-  #     tags: ${{ needs.versioning.outputs.tags }}
+          echo "::notice ::Deleting ${{ steps.extract-workspace-name.outputs.workspace_name }}"
+
+          cd ./scripts/deploy-devapp
+
+          terraform init
+          terraform workspace select '${{ steps.extract-workspace-name.outputs.workspace_name }}'
+          terraform destroy -auto-approve -set="branch=${{ steps.extract-workspace-name.outputs.branch_name }}"
+          terraform workspace delete '${{ steps.extract-workspace-name.outputs.workspace_name }}''
