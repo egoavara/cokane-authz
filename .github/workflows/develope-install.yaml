@@ -18,7 +18,7 @@ jobs:
       - uses: azure/setup-kubectl@v4
       - run: |
         mkdir -p ${HOME}/.kube
-        echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config 
+        echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
