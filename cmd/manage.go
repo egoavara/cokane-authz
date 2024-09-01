@@ -4,6 +4,7 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -36,6 +37,7 @@ to quickly create a Cobra application.`,
 			})
 		})
 		engine.Any("/stores/*paths", func(context *gin.Context) {
+
 			PROXY.Director = func(req *http.Request) {
 				req.Header = context.Request.Header
 				req.Host = PROXY_URL.Host
@@ -43,6 +45,7 @@ to quickly create a Cobra application.`,
 				req.URL.Host = PROXY_URL.Host
 				req.URL.Path = context.Param("paths")
 			}
+			log.Println("Proxying to", PROXY_URL)
 			PROXY.ServeHTTP(context.Writer, context.Request)
 		})
 		engine.Run(":80")
