@@ -260,8 +260,20 @@ resource "kubernetes_ingress_v1" "manage" {
               name = kubernetes_service.manage.metadata[0].name
               port {
                 number = kubernetes_service.manage.spec[0].port[0].port
-            }
               }
+            }
+          }
+        }
+        path {
+          path      = "/meta/${local.version}"
+          path_type = "Prefix"
+          backend {
+            service {
+              name = kubernetes_service.manage.metadata[0].name
+              port {
+                number = kubernetes_service.manage.spec[0].port[0].port
+              }
+            }
           }
         }
       }
