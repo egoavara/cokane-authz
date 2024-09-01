@@ -9,7 +9,7 @@ on:
 jobs:
   versioning:
     permissions: write-all
-    runs-on: ubuntu-latest
+    runs-on: kubernetes
     outputs:
       tags: ${{ steps.result.outputs.tags }}
     steps:
