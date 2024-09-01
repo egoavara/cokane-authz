@@ -19,19 +19,19 @@ type Manage struct {
 
 func (s *Manage) Setup(engine *gin.Engine) {
 	api := engine.Group("/api/:version/")
-	api.GET("/api/:version/", func(context *gin.Context) {
+	api.GET("/", func(context *gin.Context) {
 		context.JSON(200, gin.H{
 			"message": fmt.Sprintf("Hello from %s", context.Param("version")),
 		})
 	})
-	api.Any("/api/:version/openfga/*paths", func(context *gin.Context) {
+	api.Any("/openfga/*paths", func(context *gin.Context) {
 		s.proxy.Director = func(req *http.Request) {
 			req.Header = context.Request.Header
 			req.Host = s.proxyUrl.Host
 			req.URL.Scheme = s.proxyUrl.Scheme
 			req.URL.Host = s.proxyUrl.Host
 			req.URL.Path = context.Param("paths")
-			log.Println("Request to", req.URL)
+			log.Println("Reverse Proxy OpenFGA to", req.URL)
 		}
 		s.proxy.ServeHTTP(context.Writer, context.Request)
 	})
