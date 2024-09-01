@@ -18,7 +18,7 @@ jobs:
       - name: Setup Kubernetes
         uses: actions-hub/kubectl@master
         env:
-          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}ml.
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
