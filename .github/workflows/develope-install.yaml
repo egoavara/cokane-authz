@@ -3,6 +3,7 @@ name: develope-install
 on:
   push: 
     branches:
+      - dev
       - feature/*
   
 
@@ -10,8 +11,6 @@ jobs:
   versioning:
     permissions: write-all
     runs-on: kubernetes
-    outputs:
-      tags: ${{ steps.result.outputs.tags }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4

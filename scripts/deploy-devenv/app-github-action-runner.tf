@@ -1,4 +1,5 @@
 resource "kubernetes_manifest" "github-runner" {
+  depends_on = [helm_release.github-runner-controller]
   manifest = yamldecode(<<EOF
 apiVersion: actions.summerwind.dev/v1alpha1
 kind: RunnerDeployment
@@ -14,5 +15,5 @@ spec:
       repository: ${var.github-repo}
      
 EOF
-)
+  )
 }

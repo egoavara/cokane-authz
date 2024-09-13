@@ -21,10 +21,16 @@ variable "temporal-url" {
   default  = "http://localhost:7233"
   nullable = false
 }
- 
+
 
 variable "openfga-image" {
   type     = string
   default  = "openfga/openfga:v1.5.9"
+  nullable = false
+}
+
+variable "hosts" {
+  type     = list(string)
+  default  = ["auth.egoavara.net"]
   nullable = false
 }

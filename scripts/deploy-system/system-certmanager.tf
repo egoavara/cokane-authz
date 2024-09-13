@@ -10,3 +10,4 @@ resource "helm_release" "certmanager" {
   values           = [
     file("${path.module}/files/certmanager.yaml")
   ]
+}

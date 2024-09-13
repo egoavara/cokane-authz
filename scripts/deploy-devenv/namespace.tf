@@ -6,3 +6,12 @@ resource "kubernetes_namespace" "devenv" {
     }
   }
 }
+resource "kubernetes_namespace" "system" {
+  metadata {
+    name = "github-runner-system"
+    labels = {
+      "istio-injection" = "disabled"
+    }
+  }
+
+}

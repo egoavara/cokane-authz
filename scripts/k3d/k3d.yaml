@@ -1,0 +1,33 @@
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: egoavara-net
+kubeAPI:
+  host: "kubernetes.egoavara.net"
+  hostIP: "0.0.0.0"
+  hostPort: "6443"
+ports:
+  - port: "80:80"
+    nodeFilters:
+      - loadbalancer
+  - port: "443:443"
+    nodeFilters:
+      - loadbalancer
+servers: 2
+agents: 3
+network: k3d-egoavara-net
+options:
+  k3d:
+    wait: true
+    timeout: "60s"
+    disableLoadbalancer: false
+    disableImageVolume: false
+    disableRollback: false
+  k3s: 
+    extraArgs:
+      - arg: --tls-san=kubernetes.egoavara.net
+        nodeFilters:
+          - server:*
+      - arg: --disable=traefik
+        nodeFilters:
+          - server:*

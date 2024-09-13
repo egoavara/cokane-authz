@@ -1,4 +1,4 @@
-package service
+package controller
 
 import (
 	"fmt"
@@ -14,20 +14,22 @@ import (
 
 type PrometheusExporter struct {
 	Prometheus *ginprom.Prometheus
+	Paths      []string
 }
 
-func NewPrometheusExporter(namespace, subsystem string) *PrometheusExporter {
+func NewPrometheusExporter(namespace string, subsystem string, paths []string) *PrometheusExporter {
 	Prometheus := ginprom.New(
 		ginprom.Namespace(namespace),
 		ginprom.Subsystem(subsystem),
 		ginprom.BucketSize([]float64{.005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5, 10}),
 	)
 	return &PrometheusExporter{
-		Prometheus,
+		Prometheus: Prometheus,
+		Paths:      paths,
 	}
 }
 
-func (p *PrometheusExporter) Setup(engine *gin.Engine, paths []string) {
+func (p *PrometheusExporter) Use(engine *gin.Engine) {
 	// CPU 정보
 	p.Prometheus.AddCustomGauge("cpu_usage_ratio", "CPU Usage", []string{"cpu"})
 	// Memory 정보 (가상 메모리)
@@ -109,7 +111,7 @@ func (p *PrometheusExporter) Setup(engine *gin.Engine, paths []string) {
 		},
 		p.Prometheus.Instrument(),
 	)
-	for _, path := range paths {
+	for _, path := range p.Paths {
 		p.Prometheus.MetricsPath = path
 		p.Prometheus.Use(engine)
 	}

@@ -1,0 +1,119 @@
+openapi: 3.0.2
+info:
+  version: 1.0.0
+  title: Manager Schema
+servers:
+  - url: '{protocol}://{host}/{version}'
+    variables:
+      protocol:
+        description: Server protocol
+        default: http
+        enum:
+          - http
+          - https
+      basePath:
+        description: Base path
+        default: /v3
+      host:
+        description: Server host
+        default: auth.egoavara.net
+      version:
+        description: API version
+        default: dev
+tags:
+  - name: raft
+    description: Raft cluster management operations
+  - name: meta
+    description: Metadata operations
+  - name: openfga
+    description: openfga operations
+  - name: prometheus
+    description: Prometheus operations
+paths:
+  "/raft/node":
+    post:
+      tags:
+        - raft
+      summary: Join a raft cluster
+      description: ""
+      operationId: joinRaftCluster
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RaftMetaNode'
+      requestBody:
+        description: Raft node to join
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RaftBaseNode'
+    get:
+      tags:
+        - raft
+      summary: Get raft node information
+      description: ""
+      operationId: getRaftNode
+      parameters:
+        - in: query
+          name: isLeader
+          description: Get leader node
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - nodes
+                properties:
+                  nodes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RaftMetaNode'
+
+components:
+  schemas:
+    RaftStatus:
+      type: string
+      description: Raft node status
+      enum:
+        - leader
+        - follower
+        - non-voter
+    RaftRole:
+      type: string
+      description: Raft node role
+      enum:
+        - non-voter
+        - voter
+    RaftBaseNode:
+      type: object
+      required:
+        - id
+        - addr
+      properties:
+        id:
+          type: string
+          example: "raft-cluster-0"
+        addr:
+          type: string
+          example: "raft-cluster-0:1234"
+    RaftMetaNode:
+      allOf:
+        - $ref: '#/components/schemas/RaftBaseNode'
+        - type: object
+          required:
+            - status
+            - role
+          properties:
+            status:
+              $ref: '#/components/schemas/RaftStatus'
+            role:
+              $ref: '#/components/schemas/RaftRole'

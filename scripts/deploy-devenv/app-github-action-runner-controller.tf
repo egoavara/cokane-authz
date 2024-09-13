@@ -1,7 +1,7 @@
 resource "kubernetes_secret" "github" {
   metadata {
     name      = "controller-manager"
-    namespace = kubernetes_namespace.devenv.metadata[0].name
+    namespace = kubernetes_namespace.system.metadata[0].name
   }
 
   data = {
@@ -16,7 +16,7 @@ resource "helm_release" "github-runner-controller" {
   name       = "actions-runner-controller"
   version    = "0.23.7"
 
-  namespace        = kubernetes_namespace.devenv.metadata[0].name
+  namespace        = kubernetes_namespace.system.metadata[0].name
   create_namespace = false
   values = [
     file("${path.module}/files/github-runner-controller.yaml")

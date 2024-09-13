@@ -6,7 +6,7 @@ locals {
   }
 }
 
-resource "kubernetes_deployment" "manage" {
+resource "kubernetes_stateful_set_v1" "manage" {
   metadata {
     namespace = var.namespace
     name      = "${local.instance_name}-manage"
@@ -19,8 +19,10 @@ resource "kubernetes_deployment" "manage" {
       "app.kubernetes.io/part-of"   = local.app_name
     }
   }
+
   spec {
-    replicas = 1
+    service_name = "${local.instance_name}-manage"
+    replicas     = 1
     selector {
       match_labels = local.app_label_selector
     }
@@ -52,7 +54,7 @@ resource "kubernetes_deployment" "manage" {
         }
         container {
           name              = "git-sync"
-          image             = "k8s.gcr.io/git-sync/git-sync:v4.2.4"
+          image             = "registry.k8s.io/git-sync/git-sync:v4.2.4"
           image_pull_policy = "IfNotPresent"
 
           args = [
@@ -234,49 +236,98 @@ resource "kubernetes_service" "manage" {
   }
 }
 
-
-resource "kubernetes_ingress_v1" "manage" {
-  metadata {
-    namespace = var.namespace
-    name      = "${local.instance_name}-manage"
-    labels = {
-      app                           = local.instance_name
-      "app.kubernetes.io/name"      = local.app_name
-      "app.kubernetes.io/instance"  = local.instance_name
-      "app.kubernetes.io/version"   = local.version
-      "app.kubernetes.io/component" = "manage"
-      "app.kubernetes.io/part-of"   = local.app_name
-    }
-  }
-  spec {
-    rule {
-      host = var.host
-      http {
-        path {
-          path      = "/api/${local.version}"
-          path_type = "Prefix"
-          backend {
-            service {
-              name = kubernetes_service.manage.metadata[0].name
-              port {
-                number = kubernetes_service.manage.spec[0].port[0].port
+resource "kubernetes_manifest" "manage-vservice" {
+  manifest = {
+    apiVersion = "networking.istio.io/v1alpha3",
+    kind       = "VirtualService",
+    metadata = {
+      namespace = var.namespace,
+      name      = "${local.instance_name}-vsvc",
+    },
+    spec = {
+      hosts = [
+        "auth.egoavara.net"
+      ]
+      gateways = [
+        "cokane-authz-cokane-authz-manage-gateway"
+      ]
+      http = [
+        {
+          route = [
+            {
+              destination = {
+                host = kubernetes_service.manage.metadata[0].name,
+                port = {
+                  number = 80
+                }
+              },
+            }
+          ],
+          match = [
+            # {
+            #   uri = {
+            #     prefix = "/api/${local.version}"
+            #   }
+            # },
+            # {
+            #   uri = {
+            #     prefix = "/meta/${local.version}"
+            #   }
+            # }
+            {
+              uri = {
+                prefix = "/"
               }
             }
-          }
+          ]
         }
-        path {
-          path      = "/meta/${local.version}"
-          path_type = "Prefix"
-          backend {
-            service {
-              name = kubernetes_service.manage.metadata[0].name
-              port {
-                number = kubernetes_service.manage.spec[0].port[0].port
-              }
-            }
-          }
-        }
-      }
+      ]
     }
   }
 }
+
+# resource "kubernetes_manifest" "manage-vservice" {
+#   metadata {
+#     namespace = var.namespace
+#     name      = "${local.instance_name}-manage"
+#     labels = {
+#       app                           = local.instance_name
+#       "app.kubernetes.io/name"      = local.app_name
+#       "app.kubernetes.io/instance"  = local.instance_name
+#       "app.kubernetes.io/version"   = local.version
+#       "app.kubernetes.io/component" = "manage"
+#       "app.kubernetes.io/part-of"   = local.app_name
+#     }
+#   }
+#   spec {
+#     rule {
+#       host = var.host
+#       http {
+#         path {
+#           path      = "/api/${local.version}"
+#           path_type = "Prefix"
+#           backend {
+#             service {
+#               name = kubernetes_service.manage.metadata[0].name
+#               port {
+#                 number = kubernetes_service.manage.spec[0].port[0].port
+#               }
+#             }
+#           }
+#         }
+#         path {
+#           path      = "/meta/${local.version}"
+#           path_type = "Prefix"
+#           backend {
+#             service {
+#               name = kubernetes_service.manage.metadata[0].name
+#               port {
+#                 number = kubernetes_service.manage.spec[0].port[0].port
+#               }
+#             }
+#           }
+#         }
+#       }
+#     }
+#   }
+# }
